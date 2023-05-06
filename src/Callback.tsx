@@ -1,4 +1,5 @@
 import axios from 'axios';
+import qs from 'qs';
 import React, { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -16,16 +17,21 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
 
   const login = async (code: string, clientId: string, clientSecret: string, redirectUri: string) => {
     const getToken = async (code: string, clientId: string, clientSecret: string, redirectUri: string) => {
-      const response = await axios.post('https://api.line.me/oauth2/v2.1/token', null, {
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        params: {
-          grant_type: 'authorization_code',
-          code,
-          redirect_uri: redirectUri,
-          client_id: clientId,
-          client_secret: clientSecret,
+      const data = {
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        client_id: clientId,
+        client_secret: clientSecret,
+      };
+
+      const config = {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-      });
+      };
+
+      const response = await axios.post('https://api.line.me/oauth2/v2.1/token', qs.stringify(data), config);
 
       console.log(response.data);
       //   history.push('/');
