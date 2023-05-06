@@ -13,15 +13,9 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
   const location = useLocation();
   const [user, setUser] = React.useState<{ userId: string; displayName: string; pictureUrl: string } | null>(null);
   const [friendshipStatusChanged, setFriendshipStatusChanged] = React.useState<boolean>(false);
-  useEffect(() => {
-    const code = new URLSearchParams(location.search).get('code');
-    if (!code) {
-      return;
-    }
 
-    const friendship_status_changed = new URLSearchParams(location.search).get('friendship_status_changed');
-    setFriendshipStatusChanged(friendship_status_changed === 'true');
-    const getToken = async () => {
+  const login = async (code: string, clientId: string, clientSecret: string, redirectUri: string) => {
+    const getToken = async (code: string, clientId: string, clientSecret: string, redirectUri: string) => {
       const response = await axios.post('https://api.line.me/oauth2/v2.1/token', null, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         params: {
@@ -36,8 +30,6 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
       console.log(response.data);
       //   history.push('/');
     };
-
-    getToken();
 
     const getProfile = async () => {
       const response = await axios.get('https://api.line.me/v2/profile', {
@@ -55,7 +47,20 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
       setUser({ userId, displayName, pictureUrl });
     };
 
+    await getToken(code, clientId, clientSecret, redirectUri);
     getProfile();
+  };
+
+  useEffect(() => {
+    const code = new URLSearchParams(location.search).get('code');
+    if (!code) {
+      return;
+    }
+
+    const friendship_status_changed = new URLSearchParams(location.search).get('friendship_status_changed');
+    setFriendshipStatusChanged(friendship_status_changed === 'true');
+
+    login(code, clientId, clientSecret, redirectUri);
   }, [history, location.search, clientId, clientSecret, redirectUri]);
 
   // ログインが完了するまでは「ログイン中」を表示、ログイン後はユーザー情報を表示
