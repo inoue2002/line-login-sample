@@ -52,11 +52,7 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
         pictureUrl: string;
       };
       console.log(userId, displayName, pictureUrl);
-      return {
-        userId,
-        displayName,
-        pictureUrl,
-      };
+      setUser({ userId, displayName, pictureUrl });
     };
 
     getProfile();
