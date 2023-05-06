@@ -60,7 +60,7 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
 
     const accessToken = await getToken(code, clientId, clientSecret, redirectUri);
     await getProfile(accessToken);
-    console.log(idToken, 'idToken')
+    console.log(idToken, 'idToken');
   };
 
   useEffect(() => {
@@ -78,6 +78,7 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
   // ログインが完了するまでは「ログイン中」を表示、ログイン後はユーザー情報を表示
   return (
     <div>
+      {window.location.href}
       {user ? (
         <div>
           {user.displayName} <div>友達追加状況：{friendshipStatusChanged}</div>
