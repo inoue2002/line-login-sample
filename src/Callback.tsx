@@ -13,7 +13,6 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
   //   const history = useHistory();
   const location = useLocation();
   const [user, setUser] = React.useState<{ userId: string; displayName: string; pictureUrl: string } | null>(null);
-  const [accessToken, setAccessToken] = React.useState<string>('');
   const [idToken, setIdToken] = React.useState<string>('');
   const [friendshipStatusChanged, setFriendshipStatusChanged] = React.useState<boolean>(false);
 
@@ -37,12 +36,12 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
 
       console.log(response.data);
       console.log(response.data.access_token, 'response.data.access_token');
-      setAccessToken(response.data.access_token);
       setIdToken(response.data.id_token);
       //   history.push('/');
+      return response.data.access_token;
     };
 
-    const getProfile = async () => {
+    const getProfile = async (accessToken: string) => {
       console.log(accessToken, 'accessToken');
       const response = await axios.get('https://api.line.me/v2/profile', {
         headers: { authorization: `Bearer ${accessToken}` },
@@ -59,8 +58,9 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
       setUser({ userId, displayName, pictureUrl });
     };
 
-    await getToken(code, clientId, clientSecret, redirectUri);
-    getProfile();
+    const accessToken = await getToken(code, clientId, clientSecret, redirectUri);
+    await getProfile(accessToken);
+    console.log(idToken, 'idToken')
   };
 
   useEffect(() => {
