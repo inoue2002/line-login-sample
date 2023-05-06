@@ -13,6 +13,8 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
   const history = useHistory();
   const location = useLocation();
   const [user, setUser] = React.useState<{ userId: string; displayName: string; pictureUrl: string } | null>(null);
+  const [accessToken, setAccessToken] = React.useState<string>('');
+  const [idToken, setIdToken] = React.useState<string>('');
   const [friendshipStatusChanged, setFriendshipStatusChanged] = React.useState<boolean>(false);
 
   const login = async (code: string, clientId: string, clientSecret: string, redirectUri: string) => {
@@ -34,12 +36,14 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
       const response = await axios.post('https://api.line.me/oauth2/v2.1/token', qs.stringify(data), config);
 
       console.log(response.data);
+      setAccessToken(response.data.access_token);
+      setIdToken(response.data.id_token);
       //   history.push('/');
     };
 
     const getProfile = async () => {
       const response = await axios.get('https://api.line.me/v2/profile', {
-        headers: { authorization: `Bearer ${code}` },
+        headers: { authorization: `Bearer ${accessToken}` },
       });
 
       console.log(response.data);
@@ -67,7 +71,7 @@ const Callback: React.FC<CallbackProps> = ({ clientId, clientSecret, redirectUri
     setFriendshipStatusChanged(friendship_status_changed === 'true');
 
     login(code, clientId, clientSecret, redirectUri);
-  }, [history, location.search, clientId, clientSecret, redirectUri]);
+  }, []);
 
   // ログインが完了するまでは「ログイン中」を表示、ログイン後はユーザー情報を表示
   return (
