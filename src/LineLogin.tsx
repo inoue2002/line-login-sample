@@ -27,7 +27,7 @@ const LineLogin: React.FC = () => {
       .init({
         liffId: '1661050349-93ygRPP8',
         // @ts-ignore
-        mock: true, // enable mock mode
+        mock: false // enable mock mode
       })
       .then(async () => {
         if (!liff.isInClient()) liff.login();
