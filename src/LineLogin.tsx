@@ -30,7 +30,9 @@ const LineLogin: React.FC = () => {
         mock: false // enable mock mode
       })
       .then(async () => {
-        if (!liff.isInClient()) liff.login();
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        }
         console.log('成功');
         // setMessage('LIFF init succeeded.');
         const profile = await liff.getProfile();
