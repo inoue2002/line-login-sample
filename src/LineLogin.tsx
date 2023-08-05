@@ -16,8 +16,14 @@ import React, { useEffect } from 'react';
 
 const LineLogin: React.FC = () => {
   const [userProfile, setUserProgfile] = React.useState<Profile | null>(null);
-  const [res, setRes] = React.useState("");
   liff.use(new LiffMockPlugin());
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const addFriendUrl = process.env.REACT_APP_LINE_FRIEND_URL;
+
+  if (!apiUrl || !addFriendUrl) {
+    console.error('環境変数が設定されていません');
+  }
 
   // liffId: import.meta.env.VITE_LIFF_ID
 
@@ -39,33 +45,35 @@ const LineLogin: React.FC = () => {
         console.log({ profile });
         setUserProgfile(profile);
 
-        // window.location.srarchを送る
-
-        // DBに保存する
-
-        // にaxiosでリクエストを送る
-        const apiRes = await axios.post('https://ai-chatkun-dev.azurewebsites.net/api/line-inflow', {
+        axios.post(apiUrl + '/line-inflow', {
           idToken,
           params: window.location.search,
         });
-        setRes(apiRes.statusText);
+
+        if (addFriendUrl) {
+          liff.openWindow({
+            url: addFriendUrl,
+            external: true,
+          });
+        }
       })
       .catch((e: Error) => {
         console.log(e);
         // setMessage('LIFF init failed.');
         // setError(`${e}`);
+        // 友達追加URLに遷移
+        if (addFriendUrl) {
+          liff.openWindow({
+            url: addFriendUrl,
+            external: true,
+          });
+        }
       });
-  }, []);
+  }, [addFriendUrl, apiUrl]);
 
-  // const state = Math.random().toString(36).substring(7);
-  // console.log(redirectUri, encodeURIComponent(redirectUri));
-  // const loginUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
-  //   redirectUri
-  // )}&scope=profile+openid&state=${state}&bot_prompt=aggressive&initial_amr_display=lineqr&disable_auto_login=true`;
   return (
     <div>
       ログイン {userProfile ? userProfile.displayName : null}
-      <div>{res ? res : 'なし'}</div>
     </div>
   );
 };
